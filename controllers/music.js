@@ -23,9 +23,6 @@ module.exports.getStreamAudioMp3 = (req, res, next) => {
   });
 
   stream.pipe(res);
-  stream.on("data", () => {
-    console.log("data");
-  });
   stream.on("end", () => {
     console.log("end");
   });
