@@ -4,6 +4,8 @@ const path = require("path");
 const convertAudio = require("../convert");
 
 const mapCheckInQueueLoading = new Map();
+const historyCheck = new Map();
+const urlAudio = "https://audioplatform.onrender.com";
 
 module.exports.getStreamAudioMp3 = (req, res, next) => {
   const musicPath = req.params.musicPath;
@@ -33,6 +35,7 @@ module.exports.getConvertAudio = (req, res, next) => {
   const startTime = Date.now();
   const musicPath = req.params.musicPath;
   const musicId = req.params.musicPath.split(".")[0];
+  const format = req.params.musicPath.split(".")[1];
   console.log(musicPath);
 
   // nếu musicPath đang load thì trả về đang load
@@ -41,7 +44,8 @@ module.exports.getConvertAudio = (req, res, next) => {
       result: {
         time: (Date.now() - startTime) / 1000,
         message: "same music path in queue, please recheck later",
-        url: `https://audio-only.onrender.com/musics/${musicPath}`,
+        warning: true,
+        url: `${urlAudio}/musics/${musicPath}`,
       },
     });
 
@@ -62,20 +66,43 @@ module.exports.getConvertAudio = (req, res, next) => {
   // sau khi stream hoàn thành thì chuyển đổi sang dạng tương ứng
   stream.on("end", () => {
     console.log("end");
+    const startConvert = Date.now();
     stream.destroy();
 
     convertAudio(musicId + ".mp3", musicPath, (err) => {
       mapCheckInQueueLoading.delete(musicPath);
       if (err)
-        res.send({ error: { err, time: (Date.now() - startTime) / 1000 } });
-      else
-        res.send({
-          result: {
-            time: (Date.now() - startTime) / 1000,
-            message: "converted",
-            url: `https://audio-only.onrender.com/musics/${musicPath}`,
-          },
+        return res.send({
+          error: { err, time: (Date.now() - startTime) / 1000 },
         });
+
+      historyCheck.set(format, [
+        ...(historyCheck.get(format) || []),
+        {
+          time: (Date.now() - startTime) / 1000,
+          timeConvert: (Date.now() - startConvert) / 1000,
+          musicId,
+        },
+      ]);
+      res.send({
+        result: {
+          time: (Date.now() - startTime) / 1000,
+          timeConvert: (Date.now() - startConvert) / 1000,
+          message: "converted",
+          url: `${urlAudio}/musics/${musicPath}`,
+        },
+      });
     });
+  });
+};
+
+module.exports.getHistory = (req, res, next) => {
+  console.log("his");
+  let data = [];
+  historyCheck.forEach((value, key) => {
+    data.push({ format: key, info: value });
+  });
+  res.send({
+    result: { data },
   });
 };
