@@ -8,6 +8,7 @@ const historyCheck = new Map();
 const urlAudio = "https://audioplatform.onrender.com";
 
 module.exports.getStreamAudioMp3 = (req, res, next) => {
+  console.log("in getStreamAudioMp3");
   const musicPath = req.params.musicPath;
   const musicId = req.params.musicPath.split(".")[0];
   console.log(musicPath);
@@ -24,11 +25,13 @@ module.exports.getStreamAudioMp3 = (req, res, next) => {
 
   stream.pipe(res);
   stream.on("end", () => {
+    stream.destroy();
     console.log("end");
   });
 };
 
 module.exports.getConvertAudio = (req, res, next) => {
+  console.log("in getConvertAudio");
   const startTime = Date.now();
   const musicPath = req.params.musicPath;
   const musicId = req.params.musicPath.split(".")[0];
