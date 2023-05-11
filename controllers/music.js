@@ -49,6 +49,16 @@ module.exports.getConvertAudio = (req, res, next) => {
       },
     });
 
+  if (fs.existsSync(path.join(__dirname, "..", "musics", musicPath)))
+    return res.send({
+      result: {
+        time: (Date.now() - startTime) / 1000,
+        timeConvert: 0,
+        message: "converted",
+        url: `${urlAudio}/musics/${musicPath}`,
+      },
+    });
+
   mapCheckInQueueLoading.set(musicPath, true);
   const stream = ytdl(`https://www.youtube.com/watch?v=${musicId}`, {
     filter: "audioonly",
@@ -60,6 +70,7 @@ module.exports.getConvertAudio = (req, res, next) => {
   );
 
   stream.on("error", (err) => {
+    mapCheckInQueueLoading.delete(musicPath);
     console.log(err);
   });
 
