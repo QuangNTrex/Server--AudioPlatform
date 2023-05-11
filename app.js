@@ -3,22 +3,22 @@ const cors = require("cors");
 const path = require("path");
 const app = express();
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3001",
-      "http://localhost:3000",
-      "https://music-simple.web.app",
-    ],
-    methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:3001",
+//       "http://localhost:3000",
+//       "https://music-simple.web.app",
+//     ],
+//     methods: ["POST", "PUT", "GET", "OPTIONS", "HEAD"],
+//     credentials: true,
+//   })
+// );
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   next();
+// });
 
 app.use(express.json());
 

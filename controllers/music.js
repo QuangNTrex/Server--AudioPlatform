@@ -76,7 +76,7 @@ module.exports.getConvertAudio = (req, res, next) => {
 
   // sau khi stream hoàn thành thì chuyển đổi sang dạng tương ứng
   stream.on("end", () => {
-    console.log("end");
+    console.log("end download");
     const startConvert = Date.now();
     stream.destroy();
 
